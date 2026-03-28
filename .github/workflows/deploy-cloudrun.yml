@@ -21,8 +21,8 @@ env:
   DEPLOY_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment || 'Prod' }}
   API_SERVICE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod' }}
   UI_SERVICE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod' }}
-  API_IMAGE: ${{ format('gcr.io/{0}/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod') }}
-  UI_IMAGE: ${{ format('gcr.io/{0}/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod') }}
+  API_IMAGE: ${{ format('us-central1-docker.pkg.dev/{0}/studyguideace-api/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod') }}
+  UI_IMAGE: ${{ format('us-central1-docker.pkg.dev/{0}/studyguideace-ui/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod') }}
 
 jobs:
   deploy:
@@ -38,9 +38,9 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           export_default_credentials: true
 
-      - name: Authenticate Docker for GCR
+      - name: Authenticate Docker for Artifact Registry
         run: |
-          echo "$GCP_SA_KEY" | docker login -u _json_key --password-stdin https://gcr.io
+          echo "$GCP_SA_KEY" | docker login -u _json_key --password-stdin https://us-central1-docker.pkg.dev
         env:
           GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
 
