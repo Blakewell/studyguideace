@@ -5,17 +5,29 @@ on:
     branches:
       - main
   workflow_dispatch:
+    inputs:
+      deploy_environment:
+        description: 'Deployment target environment'
+        required: true
+        default: Dev
+        type: choice
+        options:
+          - Dev
+          - Prod
 
 env:
   GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
   GCP_REGION: us-central1
-  API_SERVICE: studyguideace-api
-  UI_SERVICE: studyguideace-ui
-  API_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/studyguideace-api
-  UI_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/studyguideace-ui
+  DEPLOY_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment || 'Prod' }}
+  SERVICE_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'dev' || 'prod' }}
+  API_SERVICE: studyguideace-api-${{ env.SERVICE_SUFFIX }}
+  UI_SERVICE: studyguideace-ui-${{ env.SERVICE_SUFFIX }}
+  API_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.API_SERVICE }}
+  UI_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.UI_SERVICE }}
 
 jobs:
   deploy:
+    environment: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment || 'Prod' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
