@@ -1,0 +1,66 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
+  GCP_REGION: us-central1
+  API_SERVICE: studyguideace-api
+  UI_SERVICE: studyguideace-ui
+  API_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/studyguideace-api
+  UI_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/studyguideace-ui
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.GCP_PROJECT }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Authenticate Docker for GCR
+        run: |
+          echo "$GCP_SA_KEY" | docker login -u _json_key --password-stdin https://gcr.io
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Build API image
+        run: |
+          docker build -t "$API_IMAGE" ./app/api
+
+      - name: Build UI image
+        run: |
+          docker build -t "$UI_IMAGE" ./app/ui
+
+      - name: Push API image
+        run: |
+          docker push "$API_IMAGE"
+
+      - name: Push UI image
+        run: |
+          docker push "$UI_IMAGE"
+
+      - name: Deploy API to Cloud Run
+        run: |
+          gcloud run deploy "$API_SERVICE" \
+            --image "$API_IMAGE" \
+            --region "$GCP_REGION" \
+            --platform managed \
+            --allow-unauthenticated
+
+      - name: Deploy UI to Cloud Run
+        run: |
+          gcloud run deploy "$UI_SERVICE" \
+            --image "$UI_IMAGE" \
+            --region "$GCP_REGION" \
+            --platform managed \
+            --allow-unauthenticated
