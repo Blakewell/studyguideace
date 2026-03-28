@@ -12,5 +12,5 @@
     "ms-vscode-remote.remote-containers",
     "ms-azuretools.vscode-docker"
   ],
-  "postCreateCommand": "sudo gcloud --version && npm --version"
+  "postCreateCommand": "sudo gcloud --version && terraform --version && npm --version"
 }
