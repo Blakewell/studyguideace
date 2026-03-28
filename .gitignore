@@ -50,3 +50,8 @@ node_modules/.vite/
 *.tmp
 *.swp
 *.swo
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
