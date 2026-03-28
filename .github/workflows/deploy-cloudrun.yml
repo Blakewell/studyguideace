@@ -21,8 +21,8 @@ env:
   DEPLOY_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment || 'Prod' }}
   API_SERVICE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod' }}
   UI_SERVICE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod' }}
-  API_IMAGE: ${{ 'gcr.io/' + secrets.GCP_PROJECT + '/' + (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod') }}
-  UI_IMAGE: ${{ 'gcr.io/' + secrets.GCP_PROJECT + '/' + (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod') }}
+  API_IMAGE: ${{ format('gcr.io/{0}/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod') }}
+  UI_IMAGE: ${{ format('gcr.io/{0}/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod') }}
 
 jobs:
   deploy:
