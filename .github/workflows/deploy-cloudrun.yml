@@ -19,11 +19,10 @@ env:
   GCP_PROJECT: ${{ secrets.GCP_PROJECT }}
   GCP_REGION: us-central1
   DEPLOY_ENV: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment || 'Prod' }}
-  SERVICE_SUFFIX: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'dev' || 'prod' }}
-  API_SERVICE: studyguideace-api-${{ env.SERVICE_SUFFIX }}
-  UI_SERVICE: studyguideace-ui-${{ env.SERVICE_SUFFIX }}
-  API_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.API_SERVICE }}
-  UI_IMAGE: gcr.io/${{ secrets.GCP_PROJECT }}/${{ env.UI_SERVICE }}
+  API_SERVICE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod' }}
+  UI_SERVICE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod' }}
+  API_IMAGE: ${{ 'gcr.io/' + secrets.GCP_PROJECT + '/' + (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod') }}
+  UI_IMAGE: ${{ 'gcr.io/' + secrets.GCP_PROJECT + '/' + (github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod') }}
 
 jobs:
   deploy:
