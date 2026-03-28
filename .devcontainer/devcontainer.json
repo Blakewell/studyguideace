@@ -1,0 +1,16 @@
+{
+  "name": "studyguideace",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspace",
+  "remoteUser": "vscode",
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+    "ms-vscode-remote.remote-containers",
+    "ms-azuretools.vscode-docker"
+  ],
+  "postCreateCommand": "sudo gcloud --version && npm --version"
+}
