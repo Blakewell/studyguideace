@@ -23,6 +23,7 @@ env:
   UI_SERVICE: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod' }}
   API_IMAGE: ${{ format('us-central1-docker.pkg.dev/{0}/studyguideace-api/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-api-dev' || 'studyguideace-api-prod') }}
   UI_IMAGE: ${{ format('us-central1-docker.pkg.dev/{0}/studyguideace-ui/{1}', secrets.GCP_PROJECT, github.event_name == 'workflow_dispatch' && github.event.inputs.deploy_environment == 'Dev' && 'studyguideace-ui-dev' || 'studyguideace-ui-prod') }}
+  CLOUD_RUN_SERVICE_ACCOUNT: ${{ secrets.GCP_RUN_SERVICE_ACCOUNT_EMAIL }}
 
 jobs:
   deploy:
@@ -64,16 +65,24 @@ jobs:
 
       - name: Deploy API to Cloud Run
         run: |
-          gcloud run deploy "$API_SERVICE" \
-            --image "$API_IMAGE" \
-            --region "$GCP_REGION" \
+          deploy_cmd="gcloud run deploy \"$API_SERVICE\" \
+            --image \"$API_IMAGE\" \
+            --region \"$GCP_REGION\" \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated"
+          if [ -n "$CLOUD_RUN_SERVICE_ACCOUNT" ]; then
+            deploy_cmd="$deploy_cmd --service-account $CLOUD_RUN_SERVICE_ACCOUNT"
+          fi
+          eval "$deploy_cmd"
 
       - name: Deploy UI to Cloud Run
         run: |
-          gcloud run deploy "$UI_SERVICE" \
-            --image "$UI_IMAGE" \
-            --region "$GCP_REGION" \
+          deploy_cmd="gcloud run deploy \"$UI_SERVICE\" \
+            --image \"$UI_IMAGE\" \
+            --region \"$GCP_REGION\" \
             --platform managed \
-            --allow-unauthenticated
+            --allow-unauthenticated"
+          if [ -n "$CLOUD_RUN_SERVICE_ACCOUNT" ]; then
+            deploy_cmd="$deploy_cmd --service-account $CLOUD_RUN_SERVICE_ACCOUNT"
+          fi
+          eval "$deploy_cmd"
