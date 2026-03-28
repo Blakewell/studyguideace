@@ -8,7 +8,7 @@ This Terraform module creates a Google Cloud DNS managed zone and CNAME records 
 ## Usage
 
 ```bash
-cd terraform
+cd .tf
 terraform init
 terraform apply -var="project_id=YOUR_PROJECT_ID"
 ```

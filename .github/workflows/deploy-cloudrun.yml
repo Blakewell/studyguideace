@@ -57,7 +57,11 @@ jobs:
 
       - name: Terraform apply
         working-directory: .tf
-        run: terraform apply -auto-approve -var="project_id=${{ env.GCP_PROJECT }}" -var="region=${{ env.GCP_REGION }}"
+        run: terraform apply -auto-approve \
+          -var="project_id=${{ env.GCP_PROJECT }}" \
+          -var="region=${{ env.GCP_REGION }}" \
+          -var="ui_host=app" \
+          -var="api_host=api"
 
       - name: Build API image
         run: |
